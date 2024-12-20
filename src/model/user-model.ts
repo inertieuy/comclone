@@ -23,6 +23,9 @@ export type UserCurrent = {
 };
 
 export type UpdateUserRequest = {
-  username: string;
-  email: string;
+  username?: string;
+  email?: string;
+};
+export type ResetUserPassword = {
+  password: string;
 };

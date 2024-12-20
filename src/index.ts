@@ -17,7 +17,7 @@ app.use(
   jwt({
     secret: Bun.env.JWTSECRET as string,
     cookie: {
-      key: 'user',
+      key: Bun.env.COOKIEKEY as string,
     },
   }),
 );

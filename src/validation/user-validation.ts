@@ -15,11 +15,12 @@ export class UserValidation {
     password: z.string().min(6).max(100),
   });
 
-  static readonly TOKEN: ZodType = z.string().min(1);
-
   static readonly UPDATE: ZodType = z.object({
     username: z.string().min(6).max(100),
     email: z.string().email(),
+  });
+
+  static readonly RESETPASSWORD: ZodType = z.object({
     password: z.string().min(6).max(100),
   });
 }

@@ -1,6 +1,7 @@
 import {
   LoginUserRequest,
   RegisterUserRequest,
+  ResetUserPassword,
   UpdateUserRequest,
   UserCurrent,
   UserResponse,
@@ -98,21 +99,48 @@ export class UserService {
     });
     return user!;
   }
-  static async update(user: User, request: UpdateUserRequest): Promise<void> {
+  static async update(
+    userId: string,
+    request: UpdateUserRequest,
+  ): Promise<UserResponse> {
     request = UserValidation.UPDATE.parse(request);
 
+    const updatedData: Partial<User> = {};
+
     if (request.username) {
-      user.username = request.username;
+      updatedData.username = request.username;
     }
     if (request.email) {
-      user.email = request.email;
+      updatedData.email = request.email;
     }
 
     await prismaClient.user.update({
       where: {
-        username: request.username,
+        id: userId,
       },
-      data: user,
+      data: updatedData,
     });
+    return { message: 'updated successfully' };
+  }
+  static async resetPassword(
+    userId: string,
+    request: ResetUserPassword,
+  ): Promise<UserResponse> {
+    request = UserValidation.RESETPASSWORD.parse(request);
+
+    request.password = await Bun.password.hash(request.password, {
+      algorithm: 'bcrypt',
+      cost: 10,
+    });
+
+    const updatedData: Partial<User> = {};
+    if (request.password) {
+      updatedData.password = request.password;
+    }
+    await prismaClient.user.update({
+      where: { id: userId },
+      data: updatedData,
+    });
+    return { message: 'reset password successfully' };
   }
 }

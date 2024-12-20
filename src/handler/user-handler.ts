@@ -3,6 +3,7 @@ import { UserService } from '../service/user-service';
 import { deleteCookie } from 'hono/cookie';
 
 export const userHandler = new Hono<{}>().basePath('/users');
+
 userHandler.get('current', async (c) => {
   const payload = c.get('jwtPayload');
 
@@ -11,17 +12,29 @@ userHandler.get('current', async (c) => {
     data: response,
   });
 });
-userHandler.patch('current', async (c) => {
+userHandler.patch('current/update', async (c) => {
   const payload = c.get('jwtPayload');
   const request = await c.req.json();
 
-  await UserService.update(payload.id, request);
+  const response = await UserService.update(payload.id, request);
 
   return c.json({
-    data: 'update success',
+    data: response.message,
   });
 });
-userHandler.delete('current', async (c) => {
+
+userHandler.patch('current/reset-password', async (c) => {
+  const payload = c.get('jwtPayload');
+  const request = await c.req.json();
+
+  const response = await UserService.resetPassword(payload.id, request);
+
+  return c.json({
+    data: response.message,
+  });
+});
+
+userHandler.delete('current/logout', async (c) => {
   deleteCookie(c, 'user');
   return c.json({
     data: 'logout success',
