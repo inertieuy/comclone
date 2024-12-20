@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { ZodError } from 'zod';
 import { userHandler } from './handler/user-handler';
+import { authHandler } from './handler/auth-handler';
 import { jwt } from 'hono/jwt';
 
 const app = new Hono();
@@ -12,7 +13,7 @@ app.get('/', (c) => {
 });
 
 app.use(
-  '/users/*',
+  '/api/*',
   jwt({
     secret: Bun.env.JWTSECRET as string,
     cookie: {
@@ -21,7 +22,9 @@ app.use(
   }),
 );
 
-app.route('/', userHandler);
+app.route('/', authHandler);
+app.route('/api', userHandler);
+
 app.onError(async (err, c) => {
   if (err instanceof HTTPException) {
     c.status(err.status);
